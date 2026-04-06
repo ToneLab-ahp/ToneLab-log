@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import type { SoundEntry } from "../types";
+import StackIcon from "../assets/icons/Bottombar/stack-tool.svg?react";
 
 // ─── Composant champ de formulaire ────────────
 interface ChampProps {
@@ -120,9 +121,9 @@ function TagsInput({ tags, onChange }: TagsInputProps) {
               key={tag}
               className="flex items-center gap-1 text-xs px-2 py-1 rounded-full"
               style={{
-                background: "hsl(262, 40%, 22%)",
-                border: "1px solid hsl(262, 40%, 35%)",
-                color: "hsl(262, 80%, 80%)",
+                background: "hsl(var(--tl-accent-dim))",
+                border: "1px solid hsl(var(--tl-accent-border))",
+                color: "hsl(var(--tl-accent-text))",
               }}
             >
               {tag}
@@ -156,9 +157,9 @@ function TagsInput({ tags, onChange }: TagsInputProps) {
           onClick={ajouterTag}
           className="px-3 py-2 rounded-md text-sm transition-colors"
           style={{
-            background: "hsl(262, 40%, 25%)",
-            border: "1px solid hsl(262, 40%, 35%)",
-            color: "hsl(262, 80%, 80%)",
+            background: "hsl(var(--tl-accent-dim))",
+            border: "1px solid hsl(var(--tl-accent-border))",
+            color: "hsl(var(--tl-accent-text))",
           }}
         >
           +
@@ -233,12 +234,17 @@ export function SoundResearchTool() {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center max-w-sm">
-          <div
+
+          <StackIcon
             className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4"
-            style={{ background: "hsl(222, 20%, 16%)" }}
-          >
-            🔍
-          </div>
+            width="48"
+            height="48"
+            style={{
+              background: "hsl(222, 20%, 16%)" ,
+              color: "hsl(var(--tl-accent-princ))" ,
+            }}
+          />
+
           <h2 className="text-base font-medium text-gray-400 mb-2">
             {projet.entries.length === 0
               ? "Aucune recherche pour l'instant"
@@ -264,8 +270,8 @@ export function SoundResearchTool() {
             <div
               className="text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider"
               style={{
-                background: "hsl(262, 40%, 22%)",
-                color: "hsl(262, 80%, 75%)",
+                background: "hsl(var(--tl-accent-mid))",
+                color: "hsl(var(--tl-accent-text))",
               }}
             >
               Sound Research
@@ -284,7 +290,7 @@ export function SoundResearchTool() {
           <h2
             className="text-xs font-semibold uppercase tracking-widest mb-3 pb-2"
             style={{
-              color: "hsl(262, 70%, 70%)",
+              color: "hsl(var(--tl-accent-text))",
               borderBottom: "1px solid hsl(220, 15%, 18%)",
             }}
           >
@@ -326,7 +332,7 @@ export function SoundResearchTool() {
           <h2
             className="text-xs font-semibold uppercase tracking-widest mb-3 pb-2"
             style={{
-              color: "hsl(210, 70%, 70%)",
+              color: "hsl(var(--tl-accent-terc))",
               borderBottom: "1px solid hsl(220, 15%, 18%)",
             }}
           >
@@ -386,8 +392,8 @@ export function SoundResearchTool() {
           <h2
             className="text-xs font-semibold uppercase tracking-widest mb-3 pb-2"
             style={{
-              color: "hsl(262, 70%, 70%)",
-              borderBottom: "1px solid hsl(220, 15%, 18%)",
+              color: "hsl(var(--tl-accent-text))",
+              borderBottom: "hsl(var(--tl-accent-border))",
             }}
           >
             Organisation

@@ -1,74 +1,146 @@
 // src/components/BottomBar.tsx
-// La barre de navigation en bas de l'écran
+// Barre d'outils en bas — icônes multi-couleurs, fond actif pleine hauteur
 
 import { useApp } from "../context/AppContext";
+import StackIcon from "../assets/icons/Bottombar/stack-tool.svg?react"; // ← décommente quand ton SVG est prêt
 
+// ─────────────────────────────────────────────────────────────────
+// Configuration des outils
+// ─────────────────────────────────────────────────────────────────
+const OUTILS = [
+  {
+    id: "stack" as const,
+    label: "Stack",
+    // Icône temporaire — remplace par <StackIcon width="24" height="24" /> quand prêt
+    icone: (
+      <StackIcon
+        width="48"
+        height="48"
+        style={{
+          color: "hsl(var(--tl-accent-princ))",
+        }}
+      />
+    ),
+  },
+  // Ajoute tes futurs outils ici :
+  // { id: 'mixer' as const, label: 'Mixer', icone: <MixerIcon width="24" height="24" /> },
+];
+
+// ─── Largeur du fond actif de chaque côté de l'icône ────────────
+// C'est la distance entre le bord de l'icône et le bord du fond coloré
+const PADDING_FOND_ACTIF = 17; // px — ajuste pour élargir ou rétrécir le fond
+
+// ─────────────────────────────────────────────────────────────────
 export function BottomBar() {
-  const { sidebarOuverte, toggleSidebar } = useApp();
+  const { sidebarOuverte, toggleSidebar, ongletActif } = useApp();
 
   return (
     <div
-      className="flex items-center gap-1 px-3 h-10 flex-shrink-0"
+      className="flex items-center flex-shrink-0"
       style={{
+        height: "72px",
         background: "hsl(222, 25%, 8%)",
         borderTop: "1px solid hsl(220, 15%, 14%)",
       }}
     >
-      {/* Bouton toggle sidebar */}
-      <button
-        onClick={toggleSidebar}
-        title={sidebarOuverte ? "Masquer la sidebar" : "Afficher la sidebar"}
-        className="flex items-center justify-center w-7 h-7 rounded transition-colors text-gray-500 hover:text-gray-300 hover:bg-white/8"
-      >
-        {/* Icône simple en SVG pour la sidebar */}
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <rect
-            x="0"
-            y="0"
-            width="5"
-            height="14"
-            rx="1"
-            opacity={sidebarOuverte ? "1" : "0.4"}
-          />
-          <rect x="7" y="0" width="7" height="2" rx="1" />
-          <rect x="7" y="4" width="7" height="2" rx="1" />
-          <rect x="7" y="8" width="7" height="2" rx="1" />
-          <rect x="7" y="12" width="7" height="2" rx="1" />
-        </svg>
-      </button>
-
-      {/* Séparateur */}
-      <div className="w-px h-5 bg-white/10 mx-1" />
-
-      {/* Onglet Research (seul onglet pour la v1) */}
-      <button
-        className="flex items-center gap-2 px-3 h-7 rounded text-sm font-medium transition-all"
-        style={{
-          background: "hsl(262, 40%, 25%)",
-          border: "1px solid hsl(262, 40%, 35%)",
-          color: "hsl(262, 80%, 85%)",
-        }}
-      >
-        {/* Icône loupe */}
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 12 12"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
+      {/* ── Bouton toggle sidebar (gauche) ── */}
+      <div className="flex items-center h-full px-3">
+        <button
+          onClick={toggleSidebar}
+          title={sidebarOuverte ? "Masquer la sidebar" : "Afficher la sidebar"}
+          className="flex items-center justify-center w-7 h-7 rounded transition-colors"
+          style={{
+            color: sidebarOuverte
+              ? `hsl(var(--tl-accent-princ))`
+              : "hsl(220, 15%, 40%)",
+          }}
         >
-          <circle cx="5" cy="5" r="4" />
-          <line x1="8.5" y1="8.5" x2="11" y2="11" />
-        </svg>
-        Research
-      </button>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+            <rect
+              x="0"
+              y="0"
+              width="5"
+              height="14"
+              rx="1"
+              opacity={sidebarOuverte ? "1" : "0.4"}
+            />
+            <rect x="7" y="0" width="7" height="2" rx="1" />
+            <rect x="7" y="4" width="7" height="2" rx="1" />
+            <rect x="7" y="8" width="7" height="2" rx="1" />
+            <rect x="7" y="12" width="7" height="2" rx="1" />
+          </svg>
+        </button>
+      </div>
 
-      {/* Espace flexible */}
-      <div className="flex-1" />
+      {/* ── Zone outils (centre) ── */}
+      <div className="flex items-center h-full flex-1 justify-center">
+        {OUTILS.map((outil) => {
+          const estActif = ongletActif === outil.id;
 
-      {/* Version de l'app (discret, à droite) */}
-      <span className="text-[11px] text-gray-700">ToneLab v1.0</span>
+          return (
+            <button
+              key={outil.id}
+              title={outil.label}
+              className="flex items-center justify-center h-full transition-all duration-150"
+              style={{
+                // Le padding horizontal définit la largeur du fond actif
+                paddingLeft: `${PADDING_FOND_ACTIF}px`,
+                paddingRight: `${PADDING_FOND_ACTIF}px`,
+
+                // Fond : légèrement plus clair que la barre quand actif, transparent sinon
+                background: estActif
+                  ? "hsl(222, 25%, 14%)" // Un peu plus clair que hsl(222, 25%, 8%)
+                  : "transparent",
+
+                // Pas de bordure, pas de rayon — rectangle pleine hauteur
+                border: "none",
+                borderRadius: "0",
+
+                // Filtre : grisé si inactif, couleurs normales si actif
+                filter: estActif ? "none" : "grayscale(1) opacity(0.4)",
+              }}
+              onMouseEnter={(e) => {
+                if (!estActif) {
+                  (e.currentTarget as HTMLButtonElement).style.filter =
+                    "grayscale(0.5) opacity(0.7)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!estActif) {
+                  (e.currentTarget as HTMLButtonElement).style.filter =
+                    "grayscale(1) opacity(0.4)";
+                }
+              }}
+            >
+              <div className="flex flex-col items-center justify-center gap-1">
+                {/* Icône */}
+                <div style={{ transform: "translateY(-4px)" }}>
+                  {outil.icone}
+                </div>
+
+                {/* Label */}
+                <span
+                  className="text-[11px]"
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    color: "hsl(220, 15%, 65%)",
+                    transform: "translateY(-2px)",
+                  }}
+                >
+                  {outil.label}
+                </span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Version (droite) ── */}
+      <div className="flex items-center h-full px-3">
+        <span className="text-[11px]" style={{ color: "hsl(220, 15%, 30%)" }}>
+          ToneLab v1.0
+        </span>
+      </div>
     </div>
   );
 }

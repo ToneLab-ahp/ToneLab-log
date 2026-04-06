@@ -38,6 +38,6 @@ export interface AppState {
     projet: ToneLabProject | null;         // Le projet actuellement ouvert (null = aucun)
     entreeSelectionnee: string | null;     // ID de l'entrée sélectionnée dans la sidebar
     sidebarOuverte: boolean;               // true = sidebar visible
-    ongletActif: 'research';               // L'outil actif dans la barre du bas
+    ongletActif: 'stack';               // L'outil actif dans la barre du bas
     modifie: boolean;                      // true = des changements non sauvegardés existent
 }

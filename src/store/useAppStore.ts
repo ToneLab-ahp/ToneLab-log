@@ -66,7 +66,7 @@ export function useAppStore() {
         projet: chargerDepuisLocalStorage(), // On charge ce qui était en localStorage
         entreeSelectionnee: null,
         sidebarOuverte: true,
-        ongletActif: 'research',
+        ongletActif: 'stack',
         modifie: false,
     }));
 
@@ -131,6 +131,17 @@ export function useAppStore() {
         lien.click();
         URL.revokeObjectURL(url); // Libère la mémoire
 
+        sauvegarderDansLocalStorage(projetMisAJour);
+        mettreAJourEtat({ projet: projetMisAJour, modifie: false });
+    }, [state.projet, mettreAJourEtat]);
+
+    // ─── Enregistrer (mise à jour silencieuse, sans téléchargement) ─
+    const enregistrerProjet = useCallback(() => {
+        if (!state.projet) return;
+        const projetMisAJour: ToneLabProject = {
+            ...state.projet,
+            date_modification: maintenant(),
+        };
         sauvegarderDansLocalStorage(projetMisAJour);
         mettreAJourEtat({ projet: projetMisAJour, modifie: false });
     }, [state.projet, mettreAJourEtat]);
@@ -229,6 +240,7 @@ export function useAppStore() {
         // Actions
         nouveauProjet,
         ouvrirProjet,
+        enregistrerProjet,
         sauvegarderProjet,
         ajouterEntree,
         modifierEntree,

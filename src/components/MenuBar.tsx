@@ -93,8 +93,25 @@ function MenuSeparateur() {
 // Composant principal : MenuBar
 // ─────────────────────────────────────────────
 export function MenuBar() {
-  const { projet, modifie, nouveauProjet, ouvrirProjet, sauvegarderProjet } =
-    useApp();
+  const {
+    projet,
+    modifie,
+    nouveauProjet,
+    ouvrirProjet,
+    enregistrerProjet,
+    sauvegarderProjet,
+  } = useApp();
+  // Raccourci clavier Ctrl+S
+  useEffect(() => {
+    function gererTouche(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        if (projet) enregistrerProjet();
+      }
+    }
+    document.addEventListener("keydown", gererTouche);
+    return () => document.removeEventListener("keydown", gererTouche);
+  }, [projet, enregistrerProjet]);
 
   // ─── Créer un nouveau projet ─────────────
   function handleNouveauProjet() {
@@ -176,8 +193,20 @@ export function MenuBar() {
         <MenuItem onClick={handleNouveauProjet}>Nouveau projet</MenuItem>
         <MenuItem onClick={handleOuvrirFichier}>Ouvrir (.tl)…</MenuItem>
         <MenuSeparateur />
+        <MenuItem onClick={enregistrerProjet} disabled={!projet || !modifie}>
+          <span>Enregistrer</span>
+          <span
+            style={{
+              color: "hsl(220, 15%, 40%)",
+              fontSize: "11px",
+              marginLeft: "8px",
+            }}
+          >
+            Ctrl+S
+          </span>
+        </MenuItem>
         <MenuItem onClick={sauvegarderProjet} disabled={!projet}>
-          Sauvegarder le projet
+          Exporter le fichier .tl…
         </MenuItem>
       </Menu>
 
@@ -215,12 +244,34 @@ export function MenuBar() {
       <div className="flex-1" />
 
       {/* Indicateur de modifications non sauvegardées */}
-      {modifie && (
-        <div className="flex items-center gap-1.5 text-xs text-amber-400/80">
-          <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-          Non sauvegardé
-        </div>
-      )}
+      {/* Après — témoin permanent */}
+      <div
+        className="flex items-center justify-center w-6 h-6"
+        title={
+          modifie
+            ? "Modifications non enregistrées — Ctrl+S"
+            : "Projet enregistré"
+        }
+      >
+        {modifie ? (
+          // Point orange — modifications en attente
+          <div
+            className="w-2 h-2 rounded-full"
+            style={{ background: "hsl(38, 90%, 55%)" }}
+          />
+        ) : projet ? (
+          // Coche verte — tout est enregistré
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <polyline
+              points="2,6.5 5,9.5 10,3"
+              stroke="hsl(var(--tl-accent-princ))"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ) : null}
+      </div>
     </div>
   );
 }
