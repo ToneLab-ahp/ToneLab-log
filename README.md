@@ -1,3 +1,3 @@
-# template-ui
+# ToneLab v0.0.0
 ***
-React + Vite + TypeScript + Tailwind + shadcn/ui
+(React + Vite + TypeScript + Tailwind + shadcn/ui)
