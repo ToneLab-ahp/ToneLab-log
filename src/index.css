@@ -1,45 +1,93 @@
+@import "@fontsource-variable/geist";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  overflow: hidden;
 }
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --background: 222 20% 10%;
+    --foreground: 210 30% 90%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 215 15% 55%;
+    --border: 220 15% 22%;
+    --input: 220 15% 22%;
+    /* SECONDAIRE 228 59% 45%*/
+    --ring: 262 80% 65%;
+    --primary: 262 80% 65%;
+    /* FIN  */
+    --primary-foreground: 0 0% 100%;
+    --accent: 220 15% 20%;
+    --accent-foreground: 210 30% 90%;
+    --secondary: 220 15% 16%;
+    --secondary-foreground: 210 30% 80%;
+    --destructive: 0 70% 55%;
+    --card: 222 20% 12%;
+    --card-foreground: 210 30% 90%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --tl-bg-deep: 222 25% 7%;
+    --tl-bg-main: 222 20% 10%;
+    --tl-bg-panel: 222 18% 13%;
+    --tl-bg-card: 222 15% 16%;
+    /* SECONDAIRE  */
+    --tl-accent-purple: 262 80% 65%;
+    /* FIN  */
+    --tl-accent-blue: 210 80% 60%;
+    --tl-border: 220 15% 22%;
+    --tl-glass: rgba(255, 255, 255, 0.04);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --background: 222 20% 10%;
+    --foreground: 210 30% 90%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 215 15% 55%;
+    --border: 220 15% 22%;
+    --input: 220 15% 22%;
+    /* SECONDAIRE  */
+    --ring: 262 80% 65%;
+    --primary: 262 80% 65%;
+    /* FIN  */
+    --primary-foreground: 0 0% 100%;
+    --accent: 220 15% 20%;
+    --accent-foreground: 210 30% 90%;
+    --secondary: 220 15% 16%;
+    --secondary-foreground: 210 30% 80%;
+    --destructive: 0 70% 55%;
+    --card: 222 20% 12%;
+    --card-foreground: 210 30% 90%;
   }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--tl-bg-deep));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--tl-border));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--tl-accent-purple));
+}
+
+.glass {
+  background: var(--tl-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--tl-border));
 }
