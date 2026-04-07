@@ -88,13 +88,13 @@ body {
     /* __________Ajout pour ajustement couleur SECONDAIRE_____________  */
     /*     hsl(var(--tl-accent-purple))     */
 
-    --tl-accent-princ: 64 80% 76%;
+    --tl-accent-princ: 192 48% 94%;
     /* SECONDAIRE PRINCIPAL  */
-    --tl-accent-h: 64;
+    --tl-accent-h: 192;
     /* Teinte (Hue) — change ce seul chiffre pour tout changer */
-    --tl-accent-s: 80%;
+    --tl-accent-s: 48%;
     /* Saturation */
-    --tl-accent-l: 76%;
+    --tl-accent-l: 94%;
     /* Luminosité */
 
     /* Variantes calculées depuis la teinte principale */

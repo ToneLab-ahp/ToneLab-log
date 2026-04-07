@@ -138,7 +138,7 @@ export function BottomBar() {
       {/* ── Version (droite) ── */}
       <div className="flex items-center h-full px-3">
         <span className="text-[11px]" style={{ color: "hsl(220, 15%, 30%)" }}>
-          ToneLab v1.0
+          ToneLab v1.0.2
         </span>
       </div>
     </div>

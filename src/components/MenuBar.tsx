@@ -100,6 +100,8 @@ export function MenuBar() {
     ouvrirProjet,
     enregistrerProjet,
     sauvegarderProjet,
+    setVueActive, // ← ajoute
+    selectionnerEntree, // ← ajoute
   } = useApp();
   // Raccourci clavier Ctrl+S
   useEffect(() => {
@@ -235,9 +237,14 @@ export function MenuBar() {
 
       {/* ── Menu Outils ── */}
       <Menu label="Outils">
-        <div className="px-4 py-2 text-xs text-gray-500">
-          Bientôt disponible…
-        </div>
+        <MenuItem
+          onClick={() => {
+            setVueActive("home");
+            selectionnerEntree(null);
+          }}
+        >
+          Stack — Galerie plugins
+        </MenuItem>
       </Menu>
 
       {/* Espace flexible pour pousser les éléments à droite */}

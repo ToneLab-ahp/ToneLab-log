@@ -1,4 +1,4 @@
-# ToneLab v01.0.1
+# ToneLab v01.0.2
 ***
 (React + Vite + TypeScript + Tailwind + shadcn/ui)
 
