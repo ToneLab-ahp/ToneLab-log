@@ -2,6 +2,7 @@
 // Métronome premium — Web Audio API, pas de dépendances externes
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { LedDisplay } from "./led-display/LedDisplay";
 
 // ─── Types ───────────────────────────────────────────────────
 type SoundType = "click" | "woodblock" | "beep" | "sine" | "rimshot";
@@ -772,23 +773,17 @@ export function Metronome() {
 
               {/* Grand affichage BPM */}
               <div className="flex items-baseline gap-3 mb-4">
-                <input
-                  type="text"
-                  value={bpmInput}
-                  onChange={(e) => handleBpmInput(e.target.value)}
-                  onBlur={handleBpmBlur}
-                  onFocus={(e) => (e.target as HTMLInputElement).select()}
-                  className="font-mono font-black text-center outline-none rounded-xl"
-                  style={{
-                    width: "110px",
-                    fontSize: "52px",
-                    lineHeight: 1,
-                    background: "hsl(222, 18%, 16%)",
-                    border: "1px solid hsl(220, 15%, 22%)",
-                    color: "hsl(var(--tl-accent-text))",
-                    padding: "6px 8px",
-                  }}
-                />
+                <div style={{ position: "relative" }}>
+                  <LedDisplay value={bpm} />
+
+                  <input
+                    type="text"
+                    value={bpmInput}
+                    onChange={(e) => handleBpmInput(e.target.value)}
+                    onBlur={handleBpmBlur}
+                    className="absolute inset-0 opacity-0 cursor-text"
+                  />
+                </div>
                 <div>
                   <p
                     className="text-xs font-semibold"

@@ -33,8 +33,8 @@ const OUTILS: {
     label: "Metro",
     icone: (
       <MetroIcon
-        width="37"
-        height="37"
+        width="35"
+        height="35"
         style={{ color: "hsl(var(--tl-accent-princ))" }}
       />
     ),
