@@ -1,5 +1,6 @@
 import React from "react";
 import "./led-display.css";
+import LedOverlay from "./assets/led-overlay.svg?react";
 
 interface Props {
   value: number | string;
@@ -11,12 +12,13 @@ export function LedDisplay({ value, digits = 3 }: Props) {
 
   return (
     <div className="led">
-
       {/* valeur active */}
       <div className="led__value">{str}</div>
 
-      {/* overlay SVG + scanlines */}
-      <div className="led__overlay" />
+      {/* overlay SVG inline — currentColor hérite de .led__overlay */}
+      <div className="led__overlay">
+        <LedOverlay />
+      </div>
     </div>
   );
 }

@@ -29,7 +29,6 @@
 .led__value {
     position: absolute;
 
-    /* font-family: "Orbitron", monospace; */
     font-family: "DigitalLed", monospace;
     font-weight: 700;
     font-size: 80px;
@@ -43,18 +42,20 @@
         0 0 28px hsl(var(--tl-accent-h) 80% 50% / 0.5);
 }
 
-/* OVERLAY SVG + CRT */
+/* OVERLAY SVG inline — currentColor reçoit la variable CSS */
 .led__overlay {
     position: absolute;
     inset: 0;
     pointer-events: none;
-
-    color: hsl(var(--tl-accent-princ) 80% 55%);
-
-    background-image: url("assets/led-overlay.svg");
-    background-size: cover;
-    background-repeat: no-repeat;
-
-    opacity: 0.2;
+    color: hsl(var(--tl-accent-overlay));
+    opacity: 0.70;
     mix-blend-mode: overlay;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.led__overlay svg {
+    width: 100%;
+    height: 100%;
 }

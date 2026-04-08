@@ -177,7 +177,7 @@ export function BottomBar() {
           }}
         />
         <span className="text-[11px]" style={{ color: "hsl(220, 15%, 30%)" }}>
-          ToneLab v1.0.4
+          ToneLab v1.0.5
         </span>
       </div>
     </div>

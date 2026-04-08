@@ -684,11 +684,11 @@ export function Metronome() {
       <div
         style={{
           width: "100%",
-          padding: "24px 100px",
+          padding: "15px 100px",
         }}
       >
         {/* ══════════ HEADER ══════════ */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-2">
           <div>
             <h1
               className="text-lg font-bold"
@@ -963,7 +963,7 @@ export function Metronome() {
               <p style={sectionTitle}>Pulsation</p>
 
               {/* Visualiseur */}
-              <div className="mb-5 min-h-[40px]">
+              <div className="mb-1 min-h-[40px]">
                 <TempoVisualizer
                   currentBeat={metro.currentBeat}
                   currentSub={metro.currentSub}
@@ -1152,8 +1152,8 @@ export function Metronome() {
             </div>
 
             {/* ══════════ POLYMÈTRE ══════════ */}
-            <div style={{ ...card, marginTop: "2px" }}>
-              <div className="flex items-center justify-between mb-3">
+            <div style={{ ...card, marginTop: "1px" }}>
+              <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <p style={{ ...sectionTitle, marginBottom: 0 }}>Polymètre</p>
                   <span
@@ -1170,7 +1170,7 @@ export function Metronome() {
                 {/* Toggle */}
                 <button
                   onClick={() => setPolyEnabled(!polyEnabled)}
-                  className="relative w-9 h-5 rounded-full transition-all"
+                  className="relative w-9 h-6 rounded-full transition-all"
                   style={{
                     background: polyEnabled
                       ? "hsl(var(--tl-accent-button))"

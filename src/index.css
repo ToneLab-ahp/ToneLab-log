@@ -88,9 +88,15 @@ body {
     /* __________Ajout pour ajustement couleur SECONDAIRE_____________  */
     /*     hsl(var(--tl-accent-purple))     */
 
-    --tl-accent-princ: 192 48% 94%;
-    /* SECONDAIRE PRINCIPAL  */
-    --tl-accent-h: 192;
+    /* __________SECONDAIRE COULEUR_____________  */
+    --tl-accent-princ: 165 48% 94%;
+    /* __________TROISIEME COULEUR_____________  */
+    --tl-accent-terc: 165 80% 76%;
+    /* __________LedOverlay_____________  */
+    --tl-accent-overlay: 165 68% 65%;
+    /* __________NUENES_____________  */
+
+    --tl-accent-h: 165;
     /* Teinte (Hue) — change ce seul chiffre pour tout changer */
     --tl-accent-s: 48%;
     /* Saturation */
@@ -111,10 +117,7 @@ body {
     --tl-accent-button-border: var(--tl-accent-h) 60% 45%;
     /* Bordure bouton */
 
-    /* __________TROISIEME COULEUR_____________  */
-    /* hsl(var(--tl-accent-terc)) */
 
-    --tl-accent-terc: 198 80% 76%;
 
   }
 }
