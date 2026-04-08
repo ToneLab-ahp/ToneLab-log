@@ -8,7 +8,7 @@ export type InstrumentType =
   | "rhodes"
   | "synthetiseur"
   | "drum"
-  | "cuivres"
+  | "tom"
   | "cordes"
   | "voix"
   | "autre";
@@ -39,10 +39,24 @@ export interface SoundEntry {
   date_modification: string;
 }
 
-// Sous-stack = une recherche sonore dans un Stack
+// ─── NOUVEAU : une recherche pour un instrument précis dans un titre ───
+// C'est le niveau le plus profond : Projet > Stack > SousStack > RechercheInstrument
+export interface RechercheInstrument {
+  id: string;
+  // Nom affiché dans la sidebar (ex: "Rhodes", "Guitare clean"…)
+  // Par défaut = le label de l'instrument, mais renommable
+  label: string;
+  entry: SoundEntry;
+}
+
+// Sous-stack = un TITRE musical dans un Stack (album)
+// Il peut contenir plusieurs recherches, une par instrument
 export interface SousStack {
   id: string;
-  titre: string; // nom de la recherche sonore
+  titre: string; // nom du titre musical
+  // Nouveau : tableau de recherches par instrument
+  recherches: RechercheInstrument[];
+  // entry gardée pour rétrocompatibilité (migration automatique)
   entry: SoundEntry;
 }
 
@@ -69,9 +83,10 @@ export interface AppState {
   projet: ToneLabProject | null;
   plugins: Plugin[];
   pluginsLoading: boolean;
-  entreeSelectionnee: string | null; // id de SoundEntry (sousStack.entry.id)
-  stackSelectionne: string | null; // id du Stack sélectionné
-  sousStackSelectionne: string | null; // id du SousStack sélectionné
+  entreeSelectionnee: string | null;    // id de SoundEntry sélectionnée
+  stackSelectionne: string | null;      // id du Stack
+  sousStackSelectionne: string | null;  // id du SousStack
+  rechercheSelectionnee: string | null; // id de RechercheInstrument (NOUVEAU)
   sidebarOuverte: boolean;
   ongletActif: "stack";
   vueActive: "home" | "stack";

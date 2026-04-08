@@ -14,7 +14,7 @@ const LABELS_INSTRUMENTS: Record<InstrumentType | "tous", string> = {
   rhodes: "Rhodes",
   synthetiseur: "Synthetiseur",
   drum: "Drum",
-  cuivres: "Cuivres",
+  tom: "Tom",
   cordes: "Cordes",
   voix: "Voix",
   autre: "Autre",

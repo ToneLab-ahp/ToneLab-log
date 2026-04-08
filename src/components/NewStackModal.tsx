@@ -11,6 +11,7 @@ import MicroIcon from "../assets/icons/Instruments/Micro.svg?react";
 import RhodesIcon from "../assets/icons/Instruments/Rhodes.svg?react";
 import SynthetiseurIcon from "../assets/icons/Instruments/synthetiseur.svg?react";
 import DrumIcon from "../assets/icons/Instruments/drum.svg?react";
+import TomIcon from "../assets/icons/Instruments/tom.svg?react";
 
 const INSTRUMENTS: {
   id: InstrumentType;
@@ -24,6 +25,7 @@ const INSTRUMENTS: {
   { id: "rhodes", label: "Rhodes", Icon: RhodesIcon },
   { id: "synthetiseur", label: "Synthé", Icon: SynthetiseurIcon },
   { id: "drum", label: "Drum", Icon: DrumIcon },
+  { id: "tom", label: "Tom", Icon: TomIcon },
 ];
 
 interface NewStackModalProps {

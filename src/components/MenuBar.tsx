@@ -3,6 +3,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useApp } from "../context/AppContext";
+import LogoIcon from "../assets/icons/Menubar/logo.svg?react";
 
 // ─── Composant Menu déroulant ────────────────
 // Props = les "paramètres" qu'on passe à un composant
@@ -178,12 +179,14 @@ export function MenuBar() {
     >
       {/* Logo / Nom de l'app */}
       <div className="flex items-center gap-2 mr-3">
-        <div
-          className="w-5 h-5 rounded flex items-center justify-center text-xs font-bold"
-          style={{ background: "hsl(262, 80%, 65%)" }}
-        >
-          T
-        </div>
+        <LogoIcon
+          width="20"
+          height="20"
+          style={{
+            color: "hsl(var(--tl-accent-princ))",
+            flexShrink: 0,
+          }}
+        />
         <span className="text-sm font-semibold text-white">ToneLab</span>
       </div>
 

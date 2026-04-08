@@ -11,11 +11,9 @@ import { useApp } from "./context/AppContext";
 function AppInner() {
   const [modalSousStackOuverte, setModalSousStackOuverte] = useState(false);
   const [stackIdCible, setStackIdCible] = useState<string | null>(null);
-  const { ajouterSousStack, projet, stackSelectionne } = useApp();
+  const { projet, stackSelectionne } = useApp();
 
   function handleOuvrirModalStack(stackId?: string) {
-    // stackId peut venir de la sidebar (clic sur + d'un stack)
-    // ou être null (depuis le bouton global)
     const id = stackId ?? stackSelectionne ?? projet?.stacks[0]?.id ?? null;
     setStackIdCible(id);
     setModalSousStackOuverte(true);
