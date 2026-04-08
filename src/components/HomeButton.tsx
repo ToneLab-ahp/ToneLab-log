@@ -1,6 +1,7 @@
 // src/components/HomeButton.tsx
 
 import { useApp } from "../context/AppContext";
+import HomeIcon from "../assets/icons/Sidebar/home.svg?react";
 
 export function HomeButton() {
   const { vueActive, setVueActive, selectionnerEntree } = useApp();
@@ -39,25 +40,15 @@ export function HomeButton() {
           import HomeIcon from '../assets/icons/Sidebar/home.svg?react';
           <HomeIcon width="14" height="14" style={{ color: estActif ? 'hsl(var(--tl-accent-princ))' : 'hsl(220,15%,55%)' }} />
       */}
-      <svg
+
+      <HomeIcon
         width="14"
         height="14"
-        viewBox="0 0 14 14"
-        fill="none"
         style={{
           color: estActif ? "hsl(var(--tl-accent-princ))" : "hsl(220,15%,55%)",
           flexShrink: 0,
         }}
-      >
-        {/* Placeholder maison — remplace par ton propre SVG */}
-        <path
-          d="M1 6.5L7 1.5L13 6.5V13H9.5V9.5H4.5V13H1V6.5Z"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      </svg>
+      />
 
       {/* Label */}
       <span
