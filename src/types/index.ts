@@ -83,12 +83,12 @@ export interface AppState {
   projet: ToneLabProject | null;
   plugins: Plugin[];
   pluginsLoading: boolean;
-  entreeSelectionnee: string | null;    // id de SoundEntry sélectionnée
-  stackSelectionne: string | null;      // id du Stack
-  sousStackSelectionne: string | null;  // id du SousStack
+  entreeSelectionnee: string | null; // id de SoundEntry sélectionnée
+  stackSelectionne: string | null; // id du Stack
+  sousStackSelectionne: string | null; // id du SousStack
   rechercheSelectionnee: string | null; // id de RechercheInstrument (NOUVEAU)
   sidebarOuverte: boolean;
-  ongletActif: "stack";
-  vueActive: "home" | "stack";
+  ongletActif: "stack" | "metro";
+  vueActive: "home" | "stack" | "metro";
   modifie: boolean;
 }

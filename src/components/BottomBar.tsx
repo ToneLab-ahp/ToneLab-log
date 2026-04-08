@@ -2,37 +2,67 @@
 // Barre d'outils en bas — icônes multi-couleurs, fond actif pleine hauteur
 
 import { useApp } from "../context/AppContext";
-import StackIcon from "../assets/icons/Bottombar/stack-tool.svg?react"; // ← décommente quand ton SVG est prêt
+import StackIcon from "../assets/icons/Bottombar/stack-tool.svg?react";
+import MetroIcon from "../assets/icons/Bottombar/metro-tool.svg?react";
+import LogoIcon from "../assets/icons/Menubar/logo.svg?react";
 
-// ─────────────────────────────────────────────────────────────────
-// Configuration des outils
-// ─────────────────────────────────────────────────────────────────
-const OUTILS = [
+
+
+import React from "react";
+
+// ─── Définition des outils ────────────────────────────────────
+// Chaque outil a : id (= ongletActif), label, icône
+const OUTILS: {
+  id: "stack" | "metro";
+  label: string;
+  icone: React.ReactNode;
+}[] = [
   {
-    id: "stack" as const,
+    id: "stack",
     label: "Stack",
-    // Icône temporaire — remplace par <StackIcon width="24" height="24" /> quand prêt
     icone: (
       <StackIcon
-        width="48"
-        height="48"
-        style={{
-          color: "hsl(var(--tl-accent-princ))",
-        }}
+        width="40"
+        height="40"
+        style={{ color: "hsl(var(--tl-accent-princ))" }}
       />
     ),
   },
-  // Ajoute tes futurs outils ici :
-  // { id: 'mixer' as const, label: 'Mixer', icone: <MixerIcon width="24" height="24" /> },
+  {
+    id: "metro",
+    label: "Metro",
+    icone: (
+      <MetroIcon
+        width="37"
+        height="37"
+        style={{ color: "hsl(var(--tl-accent-princ))" }}
+      />
+    ),
+  },
 ];
 
-// ─── Largeur du fond actif de chaque côté de l'icône ────────────
-// C'est la distance entre le bord de l'icône et le bord du fond coloré
-const PADDING_FOND_ACTIF = 17; // px — ajuste pour élargir ou rétrécir le fond
+// ─── Largeur du fond actif de chaque côté de l'icône ─────────
+const PADDING_FOND_ACTIF = 30; // px
 
-// ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 export function BottomBar() {
-  const { sidebarOuverte, toggleSidebar, ongletActif } = useApp();
+  const {
+    sidebarOuverte,
+    toggleSidebar,
+    ongletActif,
+    setOngletActif,
+    setVueActive,
+  } = useApp();
+
+  function handleOutil(id: "stack" | "metro") {
+    setOngletActif(id);
+    // "stack" conserve la vueActive courante (home ou stack)
+    // "metro" force une vue dédiée
+    if (id === "metro") setVueActive("metro");
+    // Si on revient sur Stack, on repasse en "home" par défaut
+    // (sauf si une entrée est déjà sélectionnée — géré dans SoundResearchTool)
+    if (id === "stack") setVueActive("home");
+  }
 
   return (
     <div
@@ -51,7 +81,7 @@ export function BottomBar() {
           className="flex items-center justify-center w-7 h-7 rounded transition-colors"
           style={{
             color: sidebarOuverte
-              ? `hsl(var(--tl-accent-princ))`
+              ? "hsl(var(--tl-accent-princ))"
               : "hsl(220, 15%, 40%)",
           }}
         >
@@ -81,34 +111,34 @@ export function BottomBar() {
             <button
               key={outil.id}
               title={outil.label}
+              onClick={() => handleOutil(outil.id)}
               className="flex items-center justify-center h-full transition-all duration-150"
               style={{
-                // Le padding horizontal définit la largeur du fond actif
                 paddingLeft: `${PADDING_FOND_ACTIF}px`,
                 paddingRight: `${PADDING_FOND_ACTIF}px`,
-
-                // Fond : légèrement plus clair que la barre quand actif, transparent sinon
-                background: estActif
-                  ? "hsl(222, 25%, 14%)" // Un peu plus clair que hsl(222, 25%, 8%)
-                  : "transparent",
-
-                // Pas de bordure, pas de rayon — rectangle pleine hauteur
+                background: estActif ? "hsl(222, 25%, 14%)" : "transparent",
                 border: "none",
                 borderRadius: "0",
-
-                // Filtre : grisé si inactif, couleurs normales si actif
+                // Trait de soulignement haut pour l'outil actif
+                borderTop: estActif
+                  ? "2px solid hsl(var(--tl-accent-princ))"
+                  : "2px solid transparent",
                 filter: estActif ? "none" : "grayscale(1) opacity(0.4)",
               }}
               onMouseEnter={(e) => {
                 if (!estActif) {
                   (e.currentTarget as HTMLButtonElement).style.filter =
                     "grayscale(0.5) opacity(0.7)";
+                  (e.currentTarget as HTMLButtonElement).style.background =
+                    "hsl(222, 25%, 11%)";
                 }
               }}
               onMouseLeave={(e) => {
                 if (!estActif) {
                   (e.currentTarget as HTMLButtonElement).style.filter =
                     "grayscale(1) opacity(0.4)";
+                  (e.currentTarget as HTMLButtonElement).style.background =
+                    "transparent";
                 }
               }}
             >
@@ -117,13 +147,14 @@ export function BottomBar() {
                 <div style={{ transform: "translateY(-4px)" }}>
                   {outil.icone}
                 </div>
-
                 {/* Label */}
                 <span
                   className="text-[11px]"
                   style={{
                     fontFamily: "Poppins, sans-serif",
-                    color: "hsl(220, 15%, 65%)",
+                    color: estActif
+                      ? "hsl(var(--tl-accent-princ))"
+                      : "hsl(220, 15%, 65%)",
                     transform: "translateY(-2px)",
                   }}
                 >
@@ -136,9 +167,17 @@ export function BottomBar() {
       </div>
 
       {/* ── Version (droite) ── */}
-      <div className="flex items-center h-full px-3">
+      <div className="flex items-center h-full px-3 gap-1">
+        <LogoIcon
+          width="14"
+          height="14"
+          style={{
+            color: "hsl(220, 15%, 30%)",
+            flexShrink: 0,
+          }}
+        />
         <span className="text-[11px]" style={{ color: "hsl(220, 15%, 30%)" }}>
-          ToneLab v1.0.3
+          ToneLab v1.0.4
         </span>
       </div>
     </div>

@@ -55,9 +55,17 @@ function migrerSousStack(ss: SousStack): SousStack {
 
 function labelInstrument(instr: InstrumentType | ""): string {
   const map: Record<string, string> = {
-    piano: "Piano", trombone: "Trombone", trompette: "Trompette",
-    micro: "Micro", rhodes: "Rhodes", synthetiseur: "Synthétiseur",
-    drum: "Drum", tom: "Tom", cordes: "Cordes", voix: "Voix", autre: "Autre",
+    piano: "Piano",
+    trombone: "Trombone",
+    trompette: "Trompette",
+    micro: "Micro",
+    rhodes: "Rhodes",
+    synthetiseur: "Synthétiseur",
+    drum: "Drum",
+    tom: "Tom",
+    cordes: "Cordes",
+    voix: "Voix",
+    autre: "Autre",
   };
   return map[instr] ?? "Recherche";
 }
@@ -77,7 +85,9 @@ function migrerProjet(projet: ToneLabProject): ToneLabProject {
       sousStacks: projet.entries.map((entry) => {
         const rechercheDefaut: RechercheInstrument = {
           id: genererID(),
-          label: entry.instrument ? labelInstrument(entry.instrument) : "Recherche principale",
+          label: entry.instrument
+            ? labelInstrument(entry.instrument)
+            : "Recherche principale",
           entry,
         };
         return {
@@ -152,7 +162,12 @@ export function useAppStore() {
   }, []);
 
   const setVueActive = useCallback(
-    (vue: "home" | "stack") => mettreAJourEtat({ vueActive: vue }),
+    (vue: "home" | "stack" | "metro") => mettreAJourEtat({ vueActive: vue }),
+    [mettreAJourEtat],
+  );
+
+  const setOngletActif = useCallback(
+    (onglet: "stack" | "metro") => mettreAJourEtat({ ongletActif: onglet }),
     [mettreAJourEtat],
   );
 
@@ -354,7 +369,9 @@ export function useAppStore() {
       // La première recherche = instrument choisi (ou "Recherche principale")
       const premiereRecherche: RechercheInstrument = {
         id: genererID(),
-        label: data.instrument ? labelInstrument(data.instrument) : "Recherche principale",
+        label: data.instrument
+          ? labelInstrument(data.instrument)
+          : "Recherche principale",
         entry: nouvelleEntry,
       };
 
@@ -417,7 +434,10 @@ export function useAppStore() {
       let parentEntry: SoundEntry | null = null;
       for (const s of state.projet.stacks) {
         const ss = s.sousStacks.find((ss) => ss.id === sousStackId);
-        if (ss) { parentEntry = ss.entry; break; }
+        if (ss) {
+          parentEntry = ss.entry;
+          break;
+        }
       }
 
       const nouvelleEntry: SoundEntry = {
@@ -439,7 +459,11 @@ export function useAppStore() {
 
       const nouvelleRecherche: RechercheInstrument = {
         id: genererID(),
-        label: data.labelCustom || (data.instrument ? labelInstrument(data.instrument) : "Nouvelle recherche"),
+        label:
+          data.labelCustom ||
+          (data.instrument
+            ? labelInstrument(data.instrument)
+            : "Nouvelle recherche"),
         entry: nouvelleEntry,
       };
 
@@ -449,7 +473,10 @@ export function useAppStore() {
               ...s,
               sousStacks: s.sousStacks.map((ss) =>
                 ss.id === sousStackId
-                  ? { ...ss, recherches: [...(ss.recherches ?? []), nouvelleRecherche] }
+                  ? {
+                      ...ss,
+                      recherches: [...(ss.recherches ?? []), nouvelleRecherche],
+                    }
                   : ss,
               ),
             }
@@ -514,10 +541,18 @@ export function useAppStore() {
             : state.entreeSelectionnee,
         modifie: true,
         vueActive:
-          state.rechercheSelectionnee === rechercheId ? "home" : state.vueActive,
+          state.rechercheSelectionnee === rechercheId
+            ? "home"
+            : state.vueActive,
       });
     },
-    [state.projet, state.rechercheSelectionnee, state.entreeSelectionnee, state.vueActive, mettreAJourEtat],
+    [
+      state.projet,
+      state.rechercheSelectionnee,
+      state.entreeSelectionnee,
+      state.vueActive,
+      mettreAJourEtat,
+    ],
   );
 
   // ── NOUVEAU : renommer le label d'une recherche ───────────────
@@ -666,7 +701,7 @@ export function useAppStore() {
     (id: string | null) => {
       mettreAJourEtat({
         entreeSelectionnee: id,
-        vueActive: id ? "stack" : "home",
+        vueActive: (id ? "stack" : "home") as "stack" | "home",
       });
     },
     [mettreAJourEtat],
@@ -686,7 +721,11 @@ export function useAppStore() {
               trouve = true;
               return {
                 ...r,
-                entry: { ...r.entry, ...modifications, date_modification: maintenant() },
+                entry: {
+                  ...r.entry,
+                  ...modifications,
+                  date_modification: maintenant(),
+                },
               };
             }
             return r;
@@ -694,9 +733,17 @@ export function useAppStore() {
           // Vérifie aussi l'entry directe (rétrocompat)
           const entryMisAJour =
             ss.entry.id === id
-              ? { ...ss.entry, ...modifications, date_modification: maintenant() }
+              ? {
+                  ...ss.entry,
+                  ...modifications,
+                  date_modification: maintenant(),
+                }
               : ss.entry;
-          return { ...ss, recherches: recherchesMisAJour, entry: entryMisAJour };
+          return {
+            ...ss,
+            recherches: recherchesMisAJour,
+            entry: entryMisAJour,
+          };
         }),
       }));
 
@@ -842,6 +889,7 @@ export function useAppStore() {
     // UI
     toggleSidebar,
     setVueActive,
+    setOngletActif,
     // Plugins
     ajouterPlugin,
     supprimerPlugin,
