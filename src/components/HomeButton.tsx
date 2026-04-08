@@ -58,7 +58,7 @@ export function HomeButton() {
           fontFamily: "Geist Variable, sans-serif",
         }}
       >
-        Home
+        Home (plugins)
       </span>
     </button>
   );

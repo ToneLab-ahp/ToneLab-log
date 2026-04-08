@@ -4,7 +4,6 @@ import React, { useState, useRef } from "react";
 import { useApp } from "../context/AppContext";
 import type { InstrumentType, Plugin } from "../types";
 
-// ── Import des icônes instruments ────────────────────────────
 import PianoIcon from "../assets/icons/Instruments/piano.svg?react";
 import TromboneIcon from "../assets/icons/Instruments/trombone.svg?react";
 import TrompetteIcon from "../assets/icons/Instruments/trompette.svg?react";
@@ -12,11 +11,7 @@ import MicroIcon from "../assets/icons/Instruments/Micro.svg?react";
 import RhodesIcon from "../assets/icons/Instruments/Rhodes.svg?react";
 import SynthetiseurIcon from "../assets/icons/Instruments/synthetiseur.svg?react";
 import DrumIcon from "../assets/icons/Instruments/drum.svg?react";
-// import CordesIcon from "../assets/icons/Instruments/cordes.svg?react";
-// import VoixIcon from "../assets/icons/Instruments/voix.svg?react";
-// import AutreIcon from "../assets/icons/Instruments/autre.svg?react";
 
-// ── Liste des instruments avec icône ─────────────────────────
 const INSTRUMENTS: {
   id: InstrumentType;
   label: string;
@@ -27,22 +22,22 @@ const INSTRUMENTS: {
   { id: "trompette", label: "Trompette", Icon: TrompetteIcon },
   { id: "micro", label: "Micro", Icon: MicroIcon },
   { id: "rhodes", label: "Rhodes", Icon: RhodesIcon },
-  { id: "synthetiseur", label: "Synthetiseur", Icon: SynthetiseurIcon },
+  { id: "synthetiseur", label: "Synthé", Icon: SynthetiseurIcon },
   { id: "drum", label: "Drum", Icon: DrumIcon },
-//   { id: "cuivres", label: "Cuivres", Icon: CuivresIcon },
-//   { id: "cordes", label: "Cordes", Icon: CordesIcon },
-//   { id: "voix", label: "Voix", Icon: VoixIcon },
-//   { id: "autre", label: "Autre", Icon: AutreIcon },
 ];
 
 interface NewStackModalProps {
+  stackId: string;
   onFermer: () => void;
 }
 
-export function NewStackModal({ onFermer }: NewStackModalProps) {
-  const { ajouterEntree, plugins, pluginsLoading } = useApp();
+export function NewStackModal({ stackId, onFermer }: NewStackModalProps) {
+  const { ajouterSousStack, plugins, pluginsLoading } = useApp();
 
   const [titre, setTitre] = useState("");
+  const [artiste, setArtiste] = useState("");
+  const [album, setAlbum] = useState("");
+  const [annee, setAnnee] = useState("");
   const [instrument, setInstrument] = useState<InstrumentType | "">("");
   const [pluginSelectionne, setPluginSelectionne] = useState<Plugin | null>(
     null,
@@ -53,7 +48,6 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
   const [capturePreview, setCapturePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [erreur, setErreur] = useState("");
-
   const fileRef = useRef<HTMLInputElement>(null);
 
   function handleCapture(e: React.ChangeEvent<HTMLInputElement>) {
@@ -78,8 +72,11 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
         const { uploadImageCloudinary } = await import("../lib/cloudinary");
         captureUrl = await uploadImageCloudinary(captureFile);
       }
-      ajouterEntree({
+      ajouterSousStack(stackId, {
         titre_morceau: titre.trim(),
+        artiste: artiste.trim(),
+        album: album.trim(),
+        annee: annee.trim(),
         instrument,
         pluginId: pluginSelectionne?.id ?? "",
         plugin: pluginSelectionne?.nom ?? "",
@@ -96,10 +93,30 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
     }
   }
 
-  // Fermeture au clic sur l'overlay
   function handleOverlay(e: React.MouseEvent<HTMLDivElement>) {
     if (e.target === e.currentTarget) onFermer();
   }
+
+  const inputStyle = {
+    background: "hsl(222, 20%, 16%)",
+    border: "1px solid hsl(220, 15%, 24%)",
+    color: "hsl(210, 30%, 88%)",
+    borderRadius: "0.375rem",
+    width: "100%",
+    padding: "0.5rem 0.75rem",
+    fontSize: "0.875rem",
+    outline: "none",
+  };
+
+  const labelStyle = {
+    display: "block" as const,
+    fontSize: "11px",
+    fontWeight: "600" as const,
+    textTransform: "uppercase" as const,
+    letterSpacing: "0.08em",
+    marginBottom: "6px",
+    color: "hsl(var(--tl-accent-text))",
+  };
 
   return (
     <div
@@ -113,13 +130,13 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
       <div
         className="relative flex flex-col rounded-xl shadow-2xl"
         style={{
-          width: "540px",
-          maxHeight: "88vh",
+          width: "580px",
+          maxHeight: "90vh",
           background: "hsl(222, 22%, 12%)",
           border: "1px solid hsl(220, 15%, 22%)",
         }}
       >
-        {/* ── Header ── */}
+        {/* Header */}
         <div
           className="flex items-center justify-between px-6 py-4 flex-shrink-0"
           style={{ borderBottom: "1px solid hsl(220, 15%, 18%)" }}
@@ -132,18 +149,10 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
           </h2>
           <button
             onClick={onFermer}
-            className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+            className="w-7 h-7 rounded-md flex items-center justify-center"
             style={{ color: "hsl(220, 15%, 45%)" }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background =
-                "hsl(220, 15%, 20%)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background =
-                "transparent";
-            }}
           >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+            <svg width="12" height="12" viewBox="0 0 12 12">
               <path
                 d="M1 1l10 10M11 1L1 11"
                 stroke="currentColor"
@@ -154,47 +163,95 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
           </button>
         </div>
 
-        {/* ── Corps scrollable ── */}
+        {/* Corps */}
         <div className="overflow-y-auto flex-1 px-6 py-5 flex flex-col gap-5">
-          {/* Nom */}
+          {/* Infos morceau */}
           <div>
-            <label
-              className="block text-[11px] font-semibold uppercase tracking-widest mb-2"
-              style={{ color: "hsl(var(--tl-accent-text))" }}
+            <p
+              className="text-[11px] font-bold uppercase tracking-widest mb-3"
+              style={{ color: "hsl(var(--tl-accent-terc))" }}
             >
-              Nom de la recherche *
-            </label>
-            <input
-              type="text"
-              value={titre}
-              onChange={(e) => setTitre(e.target.value)}
-              placeholder="Ex : Son clavinet Talking Book"
-              className="w-full text-sm px-3 py-2 rounded-md outline-none transition-colors"
-              style={{
-                background: "hsl(222, 20%, 16%)",
-                border: `1px solid ${titre ? "hsl(var(--tl-accent-border))" : "hsl(220, 15%, 24%)"}`,
-                color: "hsl(210, 30%, 88%)",
-              }}
-              onFocus={(e) => {
-                (e.target as HTMLInputElement).style.borderColor =
-                  "hsl(var(--tl-accent-princ))";
-              }}
-              onBlur={(e) => {
-                (e.target as HTMLInputElement).style.borderColor = titre
-                  ? "hsl(var(--tl-accent-border))"
-                  : "hsl(220, 15%, 24%)";
-              }}
-            />
+              Informations du morceau
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2">
+                <label style={labelStyle}>Titre *</label>
+                <input
+                  type="text"
+                  value={titre}
+                  onChange={(e) => setTitre(e.target.value)}
+                  placeholder="Ex : Who Knows"
+                  style={inputStyle}
+                  onFocus={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor =
+                      "hsl(var(--tl-accent-princ))";
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor =
+                      "hsl(220, 15%, 24%)";
+                  }}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Artiste</label>
+                <input
+                  type="text"
+                  value={artiste}
+                  onChange={(e) => setArtiste(e.target.value)}
+                  placeholder="Ex : Jimi Hendrix"
+                  style={inputStyle}
+                  onFocus={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor =
+                      "hsl(var(--tl-accent-princ))";
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor =
+                      "hsl(220, 15%, 24%)";
+                  }}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Album</label>
+                <input
+                  type="text"
+                  value={album}
+                  onChange={(e) => setAlbum(e.target.value)}
+                  placeholder="Ex : Band of Gypsys"
+                  style={inputStyle}
+                  onFocus={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor =
+                      "hsl(var(--tl-accent-princ))";
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor =
+                      "hsl(220, 15%, 24%)";
+                  }}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Année</label>
+                <input
+                  type="text"
+                  value={annee}
+                  onChange={(e) => setAnnee(e.target.value)}
+                  placeholder="Ex : 1970"
+                  style={inputStyle}
+                  onFocus={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor =
+                      "hsl(var(--tl-accent-princ))";
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor =
+                      "hsl(220, 15%, 24%)";
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Instrument */}
           <div>
-            <label
-              className="block text-[11px] font-semibold uppercase tracking-widest mb-2"
-              style={{ color: "hsl(var(--tl-accent-text))" }}
-            >
-              Instrument
-            </label>
+            <label style={labelStyle}>Instrument</label>
             <div className="grid grid-cols-5 gap-2">
               {INSTRUMENTS.map(({ id, label, Icon }) => {
                 const actif = instrument === id;
@@ -211,27 +268,11 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
                         ? "1px solid hsl(var(--tl-accent-border))"
                         : "1px solid transparent",
                     }}
-                    onMouseEnter={(e) => {
-                      if (!actif) {
-                        (
-                          e.currentTarget as HTMLButtonElement
-                        ).style.background = "hsl(222, 18%, 20%)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!actif) {
-                        (
-                          e.currentTarget as HTMLButtonElement
-                        ).style.background = "hsl(222, 18%, 17%)";
-                      }
-                    }}
                   >
                     <Icon
                       width="22"
                       height="22"
-                      style={{
-                        opacity: actif ? 1 : 0.6,
-                      }}
+                      style={{ opacity: actif ? 1 : 0.6 }}
                     />
                     <span
                       className="text-[10px]"
@@ -251,15 +292,10 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
 
           {/* Plugin */}
           <div>
-            <label
-              className="block text-[11px] font-semibold uppercase tracking-widest mb-2"
-              style={{ color: "hsl(var(--tl-accent-text))" }}
-            >
-              Plugin
-            </label>
+            <label style={labelStyle}>Plugin</label>
             {pluginsLoading ? (
               <p className="text-xs" style={{ color: "hsl(220, 15%, 45%)" }}>
-                Chargement des plugins…
+                Chargement…
               </p>
             ) : plugins.length === 0 ? (
               <div
@@ -270,12 +306,12 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
                   border: "1px solid hsl(220, 15%, 22%)",
                 }}
               >
-                Aucun plugin disponible — ajoutez-en depuis la galerie Home.
+                Aucun plugin — ajoutez-en depuis Home.
               </div>
             ) : (
               <div
                 className="flex flex-wrap gap-2"
-                style={{ maxHeight: "120px", overflowY: "auto" }}
+                style={{ maxHeight: "100px", overflowY: "auto" }}
               >
                 {plugins.map((p) => {
                   const actif = pluginSelectionne?.id === p.id;
@@ -314,24 +350,14 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
 
           {/* Réglages */}
           <div>
-            <label
-              className="block text-[11px] font-semibold uppercase tracking-widest mb-2"
-              style={{ color: "hsl(var(--tl-accent-text))" }}
-            >
-              Réglages / Notes du plugin
-            </label>
+            <label style={labelStyle}>Réglages / Notes du plugin</label>
             <textarea
               value={reglages}
               onChange={(e) => setReglages(e.target.value)}
-              placeholder="Ex : Attack 0ms, Decay 80%, Chorus ON, Drive 40%"
+              placeholder="Ex : Attack 0ms, Decay 80%, Chorus ON"
               rows={3}
-              className="w-full text-sm px-3 py-2 rounded-md outline-none transition-colors"
-              style={{
-                background: "hsl(222, 20%, 16%)",
-                border: "1px solid hsl(220, 15%, 24%)",
-                color: "hsl(210, 30%, 88%)",
-                resize: "vertical",
-              }}
+              className="w-full text-sm px-3 py-2 rounded-md outline-none"
+              style={{ ...inputStyle, resize: "vertical" }}
               onFocus={(e) => {
                 (e.target as HTMLTextAreaElement).style.borderColor =
                   "hsl(var(--tl-accent-princ))";
@@ -345,24 +371,14 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
 
           {/* Notes */}
           <div>
-            <label
-              className="block text-[11px] font-semibold uppercase tracking-widest mb-2"
-              style={{ color: "hsl(var(--tl-accent-text))" }}
-            >
-              Notes personnelles
-            </label>
+            <label style={labelStyle}>Notes personnelles</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Observations, contexte, idées de reproduction…"
               rows={3}
-              className="w-full text-sm px-3 py-2 rounded-md outline-none transition-colors"
-              style={{
-                background: "hsl(222, 20%, 16%)",
-                border: "1px solid hsl(220, 15%, 24%)",
-                color: "hsl(210, 30%, 88%)",
-                resize: "vertical",
-              }}
+              className="w-full text-sm px-3 py-2 rounded-md outline-none"
+              style={{ ...inputStyle, resize: "vertical" }}
               onFocus={(e) => {
                 (e.target as HTMLTextAreaElement).style.borderColor =
                   "hsl(var(--tl-accent-princ))";
@@ -374,14 +390,9 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
             />
           </div>
 
-          {/* Capture d'écran */}
+          {/* Capture */}
           <div>
-            <label
-              className="block text-[11px] font-semibold uppercase tracking-widest mb-2"
-              style={{ color: "hsl(var(--tl-accent-text))" }}
-            >
-              Capture d'écran du plugin (optionnel)
-            </label>
+            <label style={labelStyle}>Capture d'écran (optionnel)</label>
             <input
               ref={fileRef}
               type="file"
@@ -396,7 +407,7 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
                   alt="Capture"
                   className="w-full rounded-lg"
                   style={{
-                    maxHeight: "160px",
+                    maxHeight: "140px",
                     objectFit: "cover",
                     border: "1px solid hsl(220, 15%, 24%)",
                   }}
@@ -408,10 +419,7 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
                     if (fileRef.current) fileRef.current.value = "";
                   }}
                   className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs"
-                  style={{
-                    background: "hsl(0, 60%, 40%)",
-                    color: "white",
-                  }}
+                  style={{ background: "hsl(0, 60%, 40%)", color: "white" }}
                 >
                   ×
                 </button>
@@ -419,23 +427,11 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
             ) : (
               <button
                 onClick={() => fileRef.current?.click()}
-                className="w-full py-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-lg text-sm flex items-center justify-center gap-2"
                 style={{
                   background: "hsl(222, 18%, 16%)",
                   border: "1px dashed hsl(220, 15%, 28%)",
                   color: "hsl(220, 15%, 50%)",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.borderColor =
-                    "hsl(var(--tl-accent-border))";
-                  (e.currentTarget as HTMLButtonElement).style.color =
-                    "hsl(var(--tl-accent-text))";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.borderColor =
-                    "hsl(220, 15%, 28%)";
-                  (e.currentTarget as HTMLButtonElement).style.color =
-                    "hsl(220, 15%, 50%)";
                 }}
               >
                 <svg
@@ -455,7 +451,6 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
             )}
           </div>
 
-          {/* Erreur */}
           {erreur && (
             <p className="text-xs" style={{ color: "hsl(0, 70%, 60%)" }}>
               {erreur}
@@ -463,7 +458,7 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
           )}
         </div>
 
-        {/* ── Footer ── */}
+        {/* Footer */}
         <div
           className="flex items-center justify-end gap-3 px-6 py-4 flex-shrink-0"
           style={{ borderTop: "1px solid hsl(220, 15%, 18%)" }}
@@ -471,7 +466,7 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
           <button
             onClick={onFermer}
             disabled={uploading}
-            className="px-4 py-2 rounded-lg text-sm transition-colors"
+            className="px-4 py-2 rounded-lg text-sm"
             style={{
               background: "hsl(222, 18%, 18%)",
               color: "hsl(220, 15%, 60%)",
@@ -483,7 +478,7 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
           <button
             onClick={handleAjouter}
             disabled={uploading || !titre.trim()}
-            className="px-5 py-2 rounded-lg text-sm font-medium transition-all"
+            className="px-5 py-2 rounded-lg text-sm font-medium"
             style={{
               background:
                 uploading || !titre.trim()
@@ -493,33 +488,11 @@ export function NewStackModal({ onFermer }: NewStackModalProps) {
                 uploading || !titre.trim()
                   ? "hsl(220, 15%, 40%)"
                   : "hsl(var(--tl-accent-text))",
-              border: `1px solid ${uploading || !titre.trim() ? "transparent" : "hsl(var(--tl-accent-button-border))"}`,
+              border: "1px solid transparent",
               cursor: uploading || !titre.trim() ? "not-allowed" : "pointer",
             }}
           >
-            {uploading ? (
-              <span className="flex items-center gap-2">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  className="animate-spin"
-                >
-                  <circle
-                    cx="6"
-                    cy="6"
-                    r="4.5"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeDasharray="14 6"
-                  />
-                </svg>
-                Upload en cours…
-              </span>
-            ) : (
-              "Ajouter"
-            )}
+            {uploading ? "Upload…" : "Ajouter"}
           </button>
         </div>
       </div>

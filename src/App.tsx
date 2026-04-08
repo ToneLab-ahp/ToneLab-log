@@ -9,7 +9,17 @@ import { NewStackModal } from "./components/NewStackModal";
 import { useApp } from "./context/AppContext";
 
 function AppInner() {
-  const [modalStackOuverte, setModalStackOuverte] = useState(false);
+  const [modalSousStackOuverte, setModalSousStackOuverte] = useState(false);
+  const [stackIdCible, setStackIdCible] = useState<string | null>(null);
+  const { ajouterSousStack, projet, stackSelectionne } = useApp();
+
+  function handleOuvrirModalStack(stackId?: string) {
+    // stackId peut venir de la sidebar (clic sur + d'un stack)
+    // ou être null (depuis le bouton global)
+    const id = stackId ?? stackSelectionne ?? projet?.stacks[0]?.id ?? null;
+    setStackIdCible(id);
+    setModalSousStackOuverte(true);
+  }
 
   return (
     <div
@@ -19,7 +29,7 @@ function AppInner() {
       <MenuBar />
 
       <div className="flex flex-1 min-h-0">
-        <Sidebar onOuvrirModalStack={() => setModalStackOuverte(true)} />
+        <Sidebar onOuvrirModalStack={handleOuvrirModalStack} />
 
         <main
           className="flex-1 flex min-w-0"
@@ -31,9 +41,11 @@ function AppInner() {
 
       <BottomBar />
 
-      {/* Modale nouvelle recherche */}
-      {modalStackOuverte && (
-        <NewStackModal onFermer={() => setModalStackOuverte(false)} />
+      {modalSousStackOuverte && stackIdCible && (
+        <NewStackModal
+          stackId={stackIdCible}
+          onFermer={() => setModalSousStackOuverte(false)}
+        />
       )}
     </div>
   );

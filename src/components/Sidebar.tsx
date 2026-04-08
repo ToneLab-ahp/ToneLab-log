@@ -2,121 +2,388 @@
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useApp } from "../context/AppContext";
-import type { SoundEntry, ToneLabProject } from "../types";
+import type { Stack, SousStack, ToneLabProject } from "../types";
 import ProjetIcon from "../assets/icons/Sidebar/projet.svg?react";
 import StackIcon from "../assets/icons/Sidebar/stack.svg?react";
 import { HomeButton } from "./HomeButton";
 
-const LARGEUR_MIN = 180;
-const LARGEUR_MAX = 480;
-const LARGEUR_DEFAUT = 260;
+const LARGEUR_MIN = 200;
+const LARGEUR_MAX = 520;
+const LARGEUR_DEFAUT = 280;
 
-interface EntreeItemProps {
-  entry: SoundEntry;
-  estSelectionnee: boolean;
-  onSelectionner: () => void;
-  onSupprimer: () => void;
+// ── Inline edit ───────────────────────────────────────────────
+interface InlineEditProps {
+  valeur: string;
+  onSauvegarder: (val: string) => void;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-function EntreeItem({
-  entry,
-  estSelectionnee,
+function InlineEdit({
+  valeur,
+  onSauvegarder,
+  className,
+  style,
+}: InlineEditProps) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(valeur);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing) inputRef.current?.focus();
+  }, [editing]);
+
+  function confirmer() {
+    const val = draft.trim();
+    if (val && val !== valeur) onSauvegarder(val);
+    setEditing(false);
+  }
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={confirmer}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") confirmer();
+          if (e.key === "Escape") {
+            setDraft(valeur);
+            setEditing(false);
+          }
+        }}
+        onClick={(e) => e.stopPropagation()}
+        className={className}
+        style={{
+          ...style,
+          background: "hsl(222, 20%, 20%)",
+          border: "1px solid hsl(var(--tl-accent-border))",
+          borderRadius: "4px",
+          padding: "1px 4px",
+          outline: "none",
+          width: "100%",
+        }}
+      />
+    );
+  }
+
+  return (
+    <span className={className} style={style}>
+      {valeur}
+    </span>
+  );
+}
+
+// ── Icône crayon ──────────────────────────────────────────────
+function CrayonIcon({ size = 10 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 10 10"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M7 1.5l1.5 1.5L3 8.5 1 9l.5-2L7 1.5z" />
+    </svg>
+  );
+}
+
+// ── Sous-Stack item ───────────────────────────────────────────
+interface SousStackItemProps {
+  sousStack: SousStack;
+  estSelectionne: boolean;
+  onSelectionner: () => void;
+  onSupprimer: () => void;
+  onRenommer: (nom: string) => void;
+}
+
+function SousStackItem({
+  sousStack,
+  estSelectionne,
   onSelectionner,
   onSupprimer,
-}: EntreeItemProps) {
+  onRenommer,
+}: SousStackItemProps) {
   const [survol, setSurvol] = useState(false);
-  const titre = entry.titre_morceau || "Sans titre";
 
   return (
     <div
       onClick={onSelectionner}
       onMouseEnter={() => setSurvol(true)}
       onMouseLeave={() => setSurvol(false)}
-      className="flex items-center justify-between cursor-pointer rounded-md mx-1 px-2 py-1.5 transition-all"
+      className="flex items-center justify-between cursor-pointer rounded-md px-2 py-1.5 transition-all"
       style={{
-        background: estSelectionnee
+        background: estSelectionne
           ? "hsl(var(--tl-accent-dim))"
           : survol
             ? "hsl(222, 18%, 18%)"
             : "transparent",
-        borderLeft: estSelectionnee
+        borderLeft: estSelectionne
           ? "2px solid hsl(var(--tl-accent-princ))"
           : "2px solid transparent",
       }}
     >
-      <div className="flex items-center gap-2 min-w-0">
-        <StackIcon
-          width="12"
-          height="12"
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        <svg
+          width="7"
+          height="7"
+          viewBox="0 0 7 7"
+          fill="currentColor"
           style={{
-            color: estSelectionnee
+            color: estSelectionne
               ? "hsl(var(--tl-accent-princ))"
-              : "hsl(220, 15%, 45%)",
+              : "hsl(220, 15%, 40%)",
+            flexShrink: 0,
+          }}
+        >
+          <circle cx="3.5" cy="3.5" r="2.5" />
+        </svg>
+        <InlineEdit
+          valeur={sousStack.titre}
+          onSauvegarder={onRenommer}
+          className="text-xs truncate flex-1"
+          style={{
+            color: estSelectionne ? "hsl(210, 30%, 90%)" : "hsl(215, 15%, 65%)",
+            fontFamily: "Geist Variable, sans-serif",
           }}
         />
-        <span
-          className="text-xs truncate"
-          style={{
-            color: estSelectionnee
-              ? "hsl(210, 30%, 90%)"
-              : "hsl(215, 15%, 65%)",
-          }}
-        >
-          {titre}
-        </span>
       </div>
-
       {survol && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            if (window.confirm(`Supprimer "${titre}" ?`)) onSupprimer();
-          }}
-          className="flex-shrink-0 ml-1 transition-colors"
-          style={{ color: "hsl(220, 15%, 40%)" }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color =
-              "hsl(0, 70%, 60%)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color =
-              "hsl(220, 15%, 40%)";
-          }}
-        >
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-            <path
-              d="M1.5 1.5l7 7M8.5 1.5l-7 7"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
+        <div className="flex items-center gap-1 ml-1">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (window.confirm(`Supprimer "${sousStack.titre}" ?`))
+                onSupprimer();
+            }}
+            style={{ color: "hsl(220, 15%, 40%)" }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.color =
+                "hsl(0, 70%, 60%)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.color =
+                "hsl(220, 15%, 40%)";
+            }}
+          >
+            <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor">
+              <path
+                d="M1.5 1.5l7 7M8.5 1.5l-7 7"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
       )}
     </div>
   );
 }
 
-interface ProjetAccordeonProps {
-  projet: ToneLabProject;
-  onOuvrirModalStack: () => void;
+// ── Stack accordéon ───────────────────────────────────────────
+interface StackAccordeonProps {
+  stack: Stack;
+  onOuvrirModalSousStack: (stackId: string) => void;
 }
 
-function ProjetAccordeon({ projet, onOuvrirModalStack }: ProjetAccordeonProps) {
+function StackAccordeon({
+  stack,
+  onOuvrirModalSousStack,
+}: StackAccordeonProps) {
   const [ouvert, setOuvert] = useState(true);
   const [survol, setSurvol] = useState(false);
-  const { entreeSelectionnee, selectionnerEntree, supprimerEntree } = useApp();
+  const {
+    sousStackSelectionne,
+    selectionnerSousStack,
+    supprimerSousStack,
+    renommerStack,
+    supprimerStack,
+    modifierSousStack,
+  } = useApp();
 
   return (
-    <div className="mb-1">
+    <div className="mb-0.5">
+      {/* En-tête Stack */}
       <div
         onClick={() => setOuvert(!ouvert)}
         onMouseEnter={() => setSurvol(true)}
         onMouseLeave={() => setSurvol(false)}
-        className="flex items-center gap-1.5 px-2 py-1.5 mx-1 rounded-md cursor-pointer transition-all select-none"
-        style={{
-          background: survol ? "hsl(222, 18%, 17%)" : "transparent",
-        }}
+        className="flex items-center gap-1.5 px-2 py-1.5 rounded-md cursor-pointer transition-all select-none"
+        style={{ background: survol ? "hsl(222, 18%, 17%)" : "transparent" }}
+      >
+        <svg
+          width="9"
+          height="9"
+          viewBox="0 0 10 10"
+          fill="currentColor"
+          className="flex-shrink-0 transition-transform duration-150"
+          style={{
+            color: "hsl(220, 15%, 45%)",
+            transform: ouvert ? "rotate(90deg)" : "rotate(0deg)",
+          }}
+        >
+          <path d="M3 2l4 3-4 3V2z" />
+        </svg>
+
+        <StackIcon
+          width="12"
+          height="12"
+          style={{ color: "hsl(var(--tl-accent-terc))", flexShrink: 0 }}
+        />
+
+        <InlineEdit
+          valeur={stack.nom}
+          onSauvegarder={(nom) => renommerStack(stack.id, nom)}
+          className="text-xs font-semibold truncate flex-1"
+          style={{
+            color: "hsl(210, 20%, 75%)",
+            fontFamily: "Geist Variable, sans-serif",
+          }}
+        />
+
+        <span
+          className="text-[10px] flex-shrink-0"
+          style={{ color: "hsl(220, 15%, 40%)" }}
+        >
+          {stack.sousStacks.length}
+        </span>
+
+        {survol && (
+          <div
+            className="flex items-center gap-1"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => {
+                onOuvrirModalSousStack(stack.id);
+                setOuvert(true);
+              }}
+              className="flex-shrink-0 w-4 h-4 rounded flex items-center justify-center transition-all"
+              style={{
+                background: "hsl(var(--tl-accent-mid))",
+                color: "hsl(var(--tl-accent-text))",
+              }}
+              title="Nouvelle recherche"
+            >
+              <svg
+                width="8"
+                height="8"
+                viewBox="0 0 8 8"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <line x1="4" y1="1" x2="4" y2="7" />
+                <line x1="1" y1="4" x2="7" y2="4" />
+              </svg>
+            </button>
+            <button
+              onClick={() => {
+                if (
+                  window.confirm(
+                    `Supprimer le stack "${stack.nom}" et tout son contenu ?`,
+                  )
+                )
+                  supprimerStack(stack.id);
+              }}
+              className="flex-shrink-0 w-4 h-4 rounded flex items-center justify-center"
+              style={{ color: "hsl(220, 15%, 40%)" }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color =
+                  "hsl(0, 70%, 60%)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color =
+                  "hsl(220, 15%, 40%)";
+              }}
+              title="Supprimer le stack"
+            >
+              <svg width="8" height="8" viewBox="0 0 10 10" fill="currentColor">
+                <path
+                  d="M1.5 1.5l7 7M8.5 1.5l-7 7"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Sous-stacks */}
+      {ouvert && (
+        <div
+          style={{
+            marginLeft: "20px",
+            paddingLeft: "8px",
+            borderLeft: "1px solid hsl(220, 15%, 20%)",
+          }}
+        >
+          {stack.sousStacks.length === 0 ? (
+            <p
+              className="text-[10px] px-2 py-1.5"
+              style={{ color: "hsl(220, 15%, 35%)" }}
+            >
+              Aucune recherche
+            </p>
+          ) : (
+            stack.sousStacks.map((ss) => (
+              <SousStackItem
+                key={ss.id}
+                sousStack={ss}
+                estSelectionne={sousStackSelectionne === ss.id}
+                onSelectionner={() =>
+                  selectionnerSousStack(ss.id, stack.id, ss.entry.id)
+                }
+                onSupprimer={() => supprimerSousStack(ss.id)}
+                onRenommer={(nom) =>
+                  modifierSousStack(ss.id, { titre_morceau: nom })
+                }
+              />
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Projet accordéon ──────────────────────────────────────────
+interface ProjetAccordeonProps {
+  projet: ToneLabProject;
+  onOuvrirModalStack: () => void;
+  onOuvrirModalSousStack: (stackId: string) => void;
+}
+
+function ProjetAccordeon({
+  projet,
+  onOuvrirModalStack,
+  onOuvrirModalSousStack,
+}: ProjetAccordeonProps) {
+  const [ouvert, setOuvert] = useState(true);
+  const [survol, setSurvol] = useState(false);
+  const { renommerProjet } = useApp();
+  const totalSousStacks = projet.stacks.reduce(
+    (acc, s) => acc + s.sousStacks.length,
+    0,
+  );
+
+  return (
+    <div className="mb-1">
+      {/* En-tête Projet */}
+      <div
+        onClick={() => setOuvert(!ouvert)}
+        onMouseEnter={() => setSurvol(true)}
+        onMouseLeave={() => setSurvol(false)}
+        className="flex items-center gap-1.5 px-2 py-2 mx-1 rounded-md cursor-pointer transition-all select-none"
+        style={{ background: survol ? "hsl(222, 18%, 17%)" : "transparent" }}
       >
         <svg
           width="10"
@@ -133,79 +400,80 @@ function ProjetAccordeon({ projet, onOuvrirModalStack }: ProjetAccordeonProps) {
         </svg>
 
         <ProjetIcon
-          width="13"
-          height="13"
-          style={{ color: "hsl(var(--tl-accent-princ))" }}
+          width="14"
+          height="14"
+          style={{ color: "hsl(var(--tl-accent-princ))", flexShrink: 0 }}
         />
 
-        <span
-          className="text-xs font-semibold truncate flex-1"
-          style={{ color: "hsl(210, 25%, 80%)" }}
-        >
-          {projet.nom}
-        </span>
+        <InlineEdit
+          valeur={projet.nom}
+          onSauvegarder={renommerProjet}
+          className="text-sm font-bold truncate flex-1"
+          style={{
+            color: "hsl(210, 30%, 88%)",
+            fontFamily: "Geist Variable, sans-serif",
+          }}
+        />
 
         <span
           className="text-[10px] flex-shrink-0"
           style={{ color: "hsl(220, 15%, 40%)" }}
         >
-          {projet.entries.length}
+          {totalSousStacks}
         </span>
 
-        {/* Bouton + → ouvre la modale NewStack */}
         {survol && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onOuvrirModalStack();
-              setOuvert(true);
-            }}
-            className="flex-shrink-0 w-4 h-4 rounded flex items-center justify-center transition-all"
-            style={{
-              background: "hsl(var(--tl-accent-mid))",
-              color: "hsl(var(--tl-accent-text))",
-            }}
-            title="Nouvelle recherche"
+          <div
+            className="flex items-center"
+            onClick={(e) => e.stopPropagation()}
           >
-            <svg
-              width="8"
-              height="8"
-              viewBox="0 0 8 8"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
+            <button
+              onClick={onOuvrirModalStack}
+              className="flex-shrink-0 w-4 h-4 rounded flex items-center justify-center transition-all"
+              style={{
+                background: "hsl(var(--tl-accent-mid))",
+                color: "hsl(var(--tl-accent-text))",
+              }}
+              title="Nouveau stack"
             >
-              <line x1="4" y1="1" x2="4" y2="7" />
-              <line x1="1" y1="4" x2="7" y2="4" />
-            </svg>
-          </button>
+              <svg
+                width="8"
+                height="8"
+                viewBox="0 0 8 8"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <line x1="4" y1="1" x2="4" y2="7" />
+                <line x1="1" y1="4" x2="7" y2="4" />
+              </svg>
+            </button>
+          </div>
         )}
       </div>
 
+      {/* Stacks */}
       {ouvert && (
         <div
-          className="mt-0.5"
           style={{
-            marginLeft: "22px",
+            marginLeft: "16px",
             paddingLeft: "8px",
-            borderLeft: "1px solid hsl(220, 15%, 22%)",
+            borderLeft: "1px solid hsl(220, 15%, 18%)",
           }}
         >
-          {projet.entries.length === 0 ? (
+          {projet.stacks.length === 0 ? (
             <p
               className="text-[11px] px-2 py-2"
               style={{ color: "hsl(220, 15%, 38%)" }}
             >
-              Aucune recherche
+              Aucun stack — cliquez sur "+"
             </p>
           ) : (
-            projet.entries.map((entry) => (
-              <EntreeItem
-                key={entry.id}
-                entry={entry}
-                estSelectionnee={entreeSelectionnee === entry.id}
-                onSelectionner={() => selectionnerEntree(entry.id)}
-                onSupprimer={() => supprimerEntree(entry.id)}
+            projet.stacks.map((stack) => (
+              <StackAccordeon
+                key={stack.id}
+                stack={stack}
+                onOuvrirModalSousStack={onOuvrirModalSousStack}
               />
             ))
           )}
@@ -215,13 +483,145 @@ function ProjetAccordeon({ projet, onOuvrirModalStack }: ProjetAccordeonProps) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────
+// ── Modal nouveau Stack ───────────────────────────────────────
+interface NewStackModalProps {
+  onFermer: () => void;
+  onCreer: (nom: string) => void;
+}
+
+function NouveauStackModal({ onFermer, onCreer }: NewStackModalProps) {
+  const [nom, setNom] = useState("");
+
+  function handleOverlay(e: React.MouseEvent) {
+    if (e.target === e.currentTarget) onFermer();
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{
+        background: "rgba(10, 12, 20, 0.82)",
+        backdropFilter: "blur(4px)",
+      }}
+      onClick={handleOverlay}
+    >
+      <div
+        className="flex flex-col rounded-xl shadow-2xl"
+        style={{
+          width: "360px",
+          background: "hsl(222, 22%, 12%)",
+          border: "1px solid hsl(220, 15%, 22%)",
+        }}
+      >
+        <div
+          className="flex items-center justify-between px-5 py-4"
+          style={{ borderBottom: "1px solid hsl(220, 15%, 18%)" }}
+        >
+          <h2
+            className="text-sm font-semibold"
+            style={{ color: "hsl(210, 30%, 90%)" }}
+          >
+            Nouveau Stack
+          </h2>
+          <button onClick={onFermer} style={{ color: "hsl(220, 15%, 45%)" }}>
+            <svg width="12" height="12" viewBox="0 0 12 12">
+              <path
+                d="M1 1l10 10M11 1L1 11"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
+        <div className="px-5 py-4">
+          <label
+            className="block text-[11px] font-semibold uppercase tracking-widest mb-2"
+            style={{ color: "hsl(var(--tl-accent-text))" }}
+          >
+            Nom du Stack (ex: album, projet musical…)
+          </label>
+          <input
+            type="text"
+            value={nom}
+            onChange={(e) => setNom(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && nom.trim()) {
+                onCreer(nom.trim());
+                onFermer();
+              }
+            }}
+            placeholder="Ex : Band of Gypsys"
+            autoFocus
+            className="w-full text-sm px-3 py-2 rounded-md outline-none"
+            style={{
+              background: "hsl(222, 20%, 16%)",
+              border: "1px solid hsl(220, 15%, 24%)",
+              color: "hsl(210, 30%, 88%)",
+            }}
+            onFocus={(e) => {
+              (e.target as HTMLInputElement).style.borderColor =
+                "hsl(var(--tl-accent-princ))";
+            }}
+            onBlur={(e) => {
+              (e.target as HTMLInputElement).style.borderColor =
+                "hsl(220, 15%, 24%)";
+            }}
+          />
+        </div>
+        <div
+          className="flex justify-end gap-3 px-5 py-4"
+          style={{ borderTop: "1px solid hsl(220, 15%, 18%)" }}
+        >
+          <button
+            onClick={onFermer}
+            className="px-4 py-2 rounded-lg text-sm"
+            style={{
+              background: "hsl(222, 18%, 18%)",
+              color: "hsl(220, 15%, 60%)",
+              border: "1px solid hsl(220, 15%, 24%)",
+            }}
+          >
+            Annuler
+          </button>
+          <button
+            onClick={() => {
+              if (nom.trim()) {
+                onCreer(nom.trim());
+                onFermer();
+              }
+            }}
+            disabled={!nom.trim()}
+            className="px-5 py-2 rounded-lg text-sm font-medium"
+            style={{
+              background: nom.trim()
+                ? "hsl(var(--tl-accent-button))"
+                : "hsl(var(--tl-accent-dim))",
+              color: nom.trim()
+                ? "hsl(var(--tl-accent-text))"
+                : "hsl(220, 15%, 40%)",
+              border: "1px solid transparent",
+            }}
+          >
+            Créer
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Sidebar principale ────────────────────────────────────────
 interface SidebarProps {
   onOuvrirModalStack: () => void;
 }
 
 export function Sidebar({ onOuvrirModalStack }: SidebarProps) {
-  const { projet, sidebarOuverte } = useApp();
+  const { projet, sidebarOuverte, ajouterStack } = useApp();
+  const [modalNouveauStack, setModalNouveauStack] = useState(false);
+  const [stackIdPourSousStack, setStackIdPourSousStack] = useState<
+    string | null
+  >(null);
 
   const [largeur, setLargeur] = useState(LARGEUR_DEFAUT);
   const enTrainDeRedimensionner = useRef(false);
@@ -242,11 +642,12 @@ export function Sidebar({ onOuvrirModalStack }: SidebarProps) {
     function surMouvement(e: MouseEvent) {
       if (!enTrainDeRedimensionner.current) return;
       const delta = e.clientX - xDepart.current;
-      const nouvelleLargeur = Math.min(
-        Math.max(largeurDepart.current + delta, LARGEUR_MIN),
-        LARGEUR_MAX,
+      setLargeur(
+        Math.min(
+          Math.max(largeurDepart.current + delta, LARGEUR_MIN),
+          LARGEUR_MAX,
+        ),
       );
-      setLargeur(nouvelleLargeur);
     }
     function surRelachement() {
       enTrainDeRedimensionner.current = false;
@@ -262,78 +663,93 @@ export function Sidebar({ onOuvrirModalStack }: SidebarProps) {
   if (!sidebarOuverte) return null;
 
   return (
-    <div
-      className="flex flex-col h-full flex-shrink-0 relative"
-      style={{
-        width: `${largeur}px`,
-        background: "hsl(222, 20%, 11%)",
-        borderRight: "1px solid hsl(220, 15%, 18%)",
-      }}
-    >
-      {/* ── En-tête ── */}
+    <>
       <div
-        className="px-3 py-2.5 flex-shrink-0"
-        style={{ borderBottom: "1px solid hsl(220, 15%, 16%)" }}
+        className="flex flex-col h-full flex-shrink-0 relative"
+        style={{
+          width: `${largeur}px`,
+          background: "hsl(222, 20%, 11%)",
+          borderRight: "1px solid hsl(220, 15%, 18%)",
+        }}
       >
-        <span
-          className="text-[11px] font-semibold uppercase tracking-widest"
-          style={{ color: "hsl(220, 15%, 45%)" }}
+        {/* En-tête */}
+        <div
+          className="px-3 py-2.5 flex-shrink-0"
+          style={{ borderBottom: "1px solid hsl(220, 15%, 16%)" }}
         >
-          Projets
-        </span>
+          <span
+            className="text-[11px] font-semibold uppercase tracking-widest"
+            style={{ color: "hsl(220, 15%, 45%)" }}
+          >
+            Projets
+          </span>
+        </div>
+
+        {/* Bouton Home */}
+        <div className="px-2 pt-2 pb-1 flex-shrink-0">
+          <HomeButton />
+        </div>
+
+        {/* Séparateur */}
+        <div
+          className="mx-3 flex-shrink-0"
+          style={{
+            height: "1px",
+            background: "hsl(220, 15%, 18%)",
+            marginBottom: "6px",
+          }}
+        />
+
+        {/* Liste */}
+        <div className="flex-1 overflow-y-auto py-1">
+          {!projet ? (
+            <div className="px-4 py-8 text-center">
+              <p className="text-xs" style={{ color: "hsl(220, 15%, 35%)" }}>
+                Aucun projet ouvert.
+                <br />
+                Utilisez Fichier → Nouveau projet
+              </p>
+            </div>
+          ) : (
+            <ProjetAccordeon
+              projet={projet}
+              onOuvrirModalStack={() => setModalNouveauStack(true)}
+              onOuvrirModalSousStack={(stackId) => {
+                setStackIdPourSousStack(stackId);
+                onOuvrirModalStack();
+              }}
+            />
+          )}
+        </div>
+
+        {/* Poignée redimensionnement */}
+        <div
+          onMouseDown={demarrerRedimensionnement}
+          className="absolute top-0 right-0 h-full transition-colors"
+          style={{
+            width: "4px",
+            cursor: "col-resize",
+            background: "transparent",
+            zIndex: 10,
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLDivElement).style.background =
+              "hsl(var(--tl-accent-princ) / 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLDivElement).style.background =
+              "transparent";
+          }}
+        />
       </div>
 
-      {/* ── Bouton Home ── */}
-      <div className="px-2 pt-2 pb-1 flex-shrink-0">
-        <HomeButton />
-      </div>
-
-      {/* ── Séparateur ── */}
-      <div
-        className="mx-3 flex-shrink-0"
-        style={{
-          height: "1px",
-          background: "hsl(220, 15%, 18%)",
-          marginBottom: "6px",
-        }}
-      />
-
-      {/* ── Liste des projets ── */}
-      <div className="flex-1 overflow-y-auto py-1">
-        {!projet ? (
-          <div className="px-4 py-8 text-center">
-            <p className="text-xs" style={{ color: "hsl(220, 15%, 35%)" }}>
-              Aucun projet ouvert.
-              <br />
-              Utilisez Fichier → Nouveau projet
-            </p>
-          </div>
-        ) : (
-          <ProjetAccordeon
-            projet={projet}
-            onOuvrirModalStack={onOuvrirModalStack}
-          />
-        )}
-      </div>
-
-      {/* ── Poignée de redimensionnement ── */}
-      <div
-        onMouseDown={demarrerRedimensionnement}
-        className="absolute top-0 right-0 h-full transition-colors"
-        style={{
-          width: "4px",
-          cursor: "col-resize",
-          background: "transparent",
-          zIndex: 10,
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLDivElement).style.background =
-            "hsl(var(--tl-accent-princ) / 0.3)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLDivElement).style.background = "transparent";
-        }}
-      />
-    </div>
+      {/* Modal nouveau Stack */}
+      {modalNouveauStack && (
+        <NouveauStackModal
+          onFermer={() => setModalNouveauStack(false)}
+          onCreer={(nom) => ajouterStack(nom)}
+        />
+      )}
+    </>
   );
 }
